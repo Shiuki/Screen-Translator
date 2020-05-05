@@ -36,38 +36,15 @@ namespace ShiukiTranslator
    
         private void Button1_Click_1(object sender, EventArgs e)
         {
-
-            try
+            if(checkBox2.Checked)
             {
-
-                Bitmap image = new Bitmap(CaptureApplication(finalfortrans));
-
-                string FilePath = @Application.StartupPath + "/latest.png";
-
-                image.Save(FilePath, System.Drawing.Imaging.ImageFormat.Png);
-
-                var Result = GetText(image);
-
-
-
-
-
-
-                Console.WriteLine(@Result);
-                if (Result != "")
-                {
-                    richTextBox1.Text = $"{TranslateText(@Result)}";
-                }
-                else
-                {
-                    richTextBox1.Text = $"Error, Couldn't detect text on language: {froml} on Process {finalfortrans}  \nThe image might be blurry or maybe the From language is wrong, also did you remember to choose right process?";
-                }
-                image.Dispose();
+                translateregion();
             }
-            catch
+            else
             {
-                richTextBox1.Text = $"Error, Couldn't detect text on language: {froml} on Process {finalfortrans}  \nThe image might be blurry or maybe the From language is wrong, also did you remember to choose right process?" ;
+                translatebybutton();
             }
+           
         }
         static string froml = "eng";
      
@@ -81,6 +58,7 @@ namespace ShiukiTranslator
                     using (var page = engine.Process(img))
                     {
                         ocrtext = page.GetText();
+                        img.Save("processed.png");
                     }
                 }
             }
@@ -391,28 +369,150 @@ namespace ShiukiTranslator
             {
                 try
                 {
-
-                    Bitmap image = new Bitmap(CaptureApplication(finalfortrans));
-
-                    string FilePath = @Application.StartupPath + "/latestauto.png";
-
-                    image.Save(FilePath, System.Drawing.Imaging.ImageFormat.Png);
-
-                    var Result = GetText(image);
-
-
-
-                    if (Result != "" && lateees != Result)
+                    if (!checkBox2.Checked)
                     {
-                        Console.WriteLine(@Result);
-                        richTextBox1.Text = $"{TranslateText(@Result)}";
-                        lateees = Result;
+                        translateauto();
                     }
-                    image.Dispose();
+                    else
+                    {
+                        translateregion();
+                    }
+                  
                 }
                 catch
                 {
                 }
+            }
+        }
+        void translateauto()
+        {
+            Bitmap image = new Bitmap(CaptureApplication(finalfortrans));
+
+            string FilePath = @Application.StartupPath + "/latestauto.png";
+
+            image.Save(FilePath, System.Drawing.Imaging.ImageFormat.Png);
+
+            var Result = GetText(image);
+
+
+
+            if (Result != "" && lateees != Result)
+            {
+                Console.WriteLine(@Result);
+                richTextBox1.Text = $"{TranslateText(@Result)}";
+                lateees = Result;
+            }
+            image.Dispose();
+        }
+        void translatebybutton()
+        {
+            try
+            {
+
+                Bitmap image = new Bitmap(CaptureApplication(finalfortrans));
+
+                string FilePath = @Application.StartupPath + "/latest.png";
+
+                image.Save(FilePath, System.Drawing.Imaging.ImageFormat.Png);
+
+                var Result = GetText(image);
+
+
+
+
+
+
+                Console.WriteLine(@Result);
+                if (Result != "")
+                {
+                    richTextBox1.Text = $"{TranslateText(@Result)}";
+                }
+                else
+                {
+                    richTextBox1.Text = $"Error, Couldn't detect text on language: {froml} on Process {finalfortrans}  \nThe image might be blurry or maybe the From language is wrong, also did you remember to choose right process?";
+                }
+                image.Dispose();
+            }
+            catch
+            {
+                richTextBox1.Text = $"Error, Couldn't detect text on language: {froml} on Process {finalfortrans}  \nThe image might be blurry or maybe the From language is wrong, also did you remember to choose right process?";
+            }
+        }
+
+        void translateregion()
+        {
+
+
+
+            formu2.Text = "";
+            Bitmap b = new Bitmap(formu2.Width,
+                         formu2.Height);
+            Graphics graphics = Graphics.FromImage(b as Image);
+            graphics.CopyFromScreen(formu2.Bounds.X, formu2.Bounds.Y, 0, 0, b.Size);
+
+            //formu2.DrawToBitmap(b, new Rectangle(0, 0, formu2.Width, formu2.Height));
+
+            b.Save("latest.png");
+            formu2.Text = "Region";
+
+
+            try
+            {
+
+                Bitmap image = b;
+
+
+             
+
+                var Result = GetText(b);
+
+
+
+
+
+
+                Console.WriteLine(@Result);
+                if (Result != "")
+                {
+                    richTextBox1.Text = $"{TranslateText(@Result)}";
+                }
+                else
+                {
+                    richTextBox1.Text = $"Error, Couldn't detect text on language: {froml} on Process {finalfortrans}  \nThe image might be blurry or maybe the From language is wrong, also did you remember to choose right process?";
+                }
+                image.Dispose();
+            }
+            catch
+            {
+                richTextBox1.Text = $"Error, Couldn't detect text on language: {froml} on Process {finalfortrans}  \nThe image might be blurry or maybe the From language is wrong, also did you remember to choose right process?";
+            }
+
+
+        }
+        Form2 formu2 = new Form2();
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                formu2.Show();
+                label4.Hide();
+                listBox1.Hide();
+                textBox1.Hide();
+                button2.Hide();
+          
+                label3.Text = "Region";
+                button1.Text = "Translate Region";
+
+
+            }
+            else
+            {
+                button1.Text = "Translate Window";
+                formu2.Hide();
+                label4.Show();
+                listBox1.Show();
+                textBox1.Show();
+                button2.Show();
             }
         }
     }
